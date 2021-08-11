@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Threading.Tasks;
 
 namespace WebApp.Security
 {
@@ -21,7 +20,7 @@ namespace WebApp.Security
                 Subject = new ClaimsIdentity(new Claim[] {
                             new Claim(ClaimTypes.Name, user.Person.CompleteName.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddSeconds(30),
+                Expires = DateTime.UtcNow.AddMinutes(60),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(SecuritySettings.KeyEncoding),
                 SecurityAlgorithms.HmacSha256Signature)
             };
@@ -39,7 +38,7 @@ namespace WebApp.Security
             }).AddJwtBearer(x =>
             {
                 x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
+                x.SaveToken = false;
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
@@ -47,14 +46,10 @@ namespace WebApp.Security
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateLifetime = true,
-                };
-                x.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
+                    LifetimeValidator = (DateTime? notBefore, DateTime? expires, SecurityToken securityToken, TokenValidationParameters validationParameters) =>
                     {
-                        context.Token = context.Request.Cookies["WebAppAuthorization"];
-                        return Task.CompletedTask;
-                    }
+                        return notBefore <= DateTime.UtcNow && expires >= DateTime.UtcNow;
+                    },
                 };
             });
 

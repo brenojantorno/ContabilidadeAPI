@@ -38,13 +38,13 @@ namespace WebApp
 
             services.AddTokenJwtAuthenticate(Configuration);
             services.AddAuthorization();
-            //services.AddMvc(config =>
-            //{
-            //    var policy = new AuthorizationPolicyBuilder()
-            //                      .RequireAuthenticatedUser()
-            //                      .Build();
-            //    config.Filters.Add(new AuthorizeFilter(policy));
-            //});
+            services.AddMvc(config =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                                  .RequireAuthenticatedUser()
+                                  .Build();
+                config.Filters.Add(new AuthorizeFilter(policy));
+            });
 
             services.AddSingleton<ISessionUser, SessionUser>();
             services.AddScoped<IRepository, GenericRepository>();
@@ -69,11 +69,9 @@ namespace WebApp
                 x.AllowAnyHeader();
             });
 
-
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseAuthenticationMiddleware();
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

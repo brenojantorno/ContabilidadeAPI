@@ -57,15 +57,7 @@ namespace WebApp.Controllers
 
                 var x = await _repository.AddAsync<SessionUser>(sessionUser);
 
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Expires = DateTime.Now.AddMinutes(60),
-                };
-
-                HttpContext.Response.Cookies.Append("WebAppAuthorization", token, cookieOptions);
-
-                return Ok(new { sucess = true });
+                return Ok(new { sucess = true, token =  token });
             }
             return BadRequest();
         }
