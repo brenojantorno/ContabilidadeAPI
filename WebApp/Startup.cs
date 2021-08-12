@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using WebApp.Models;
 using WebApp.Models.Interfaces;
 using Microsoft.AspNetCore.Localization;
+using Swashbuckle.AspNetCore;
+using Microsoft.OpenApi.Models;
 
 namespace WebApp
 {
@@ -32,6 +34,10 @@ namespace WebApp
         {
             services.AddCors();
             services.AddControllers();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ContabilidadeWebApi", Version = "v1" }); 
+            });
             services.AddDbContext<WebAppContext>(options =>
                 options.UseLazyLoadingProxies()
                 .UseMySql(Configuration.GetConnectionString("default"), ServerVersion.AutoDetect(Configuration.GetConnectionString("default"))));
@@ -58,6 +64,13 @@ namespace WebApp
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseSwagger();
+            app.UseSwaggerUI(op =>
+            {
+                op.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApplication1 v1");
+                op.RoutePrefix = string.Empty;
+            });
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
@@ -71,7 +84,7 @@ namespace WebApp
 
             app.UseAuthentication();
             app.UseAuthorization();
-            
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

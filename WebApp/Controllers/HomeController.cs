@@ -9,6 +9,8 @@ using WebApp.Models.Interfaces;
 using WebApp.Security;
 using WebApp.ModelViews;
 using WebApp.Models;
+using Swashbuckle.AspNetCore.Annotations;
+using Newtonsoft.Json;
 
 namespace WebApp.Controllers
 {
@@ -29,6 +31,8 @@ namespace WebApp.Controllers
 
         [HttpPost("Login")]
         [AllowAnonymous]
+        [SwaggerResponse(200, "Login efetuado com sucesso", typeof(MVUser))]
+        [SwaggerResponse(500, "Error interno", typeof(GenericError))]
         public async Task<IActionResult> Login(MVUser model)
         {
             if (ModelState.IsValid)
@@ -56,8 +60,11 @@ namespace WebApp.Controllers
                 };
 
                 var x = await _repository.AddAsync<SessionUser>(sessionUser);
+                var obj = new { token = token };
 
-                return Ok(new { sucess = true, token =  token });
+                var result = JsonConvert.SerializeObject(obj);
+
+                return Ok(result);
             }
             return BadRequest();
         }

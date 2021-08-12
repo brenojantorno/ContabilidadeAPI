@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using WebApp.Models;
@@ -9,10 +10,12 @@ namespace WebApp.ModelViews
     {
         public int? id { get; set; }
 
+        [JsonProperty("login")]
         [Required(ErrorMessage = "Um nome é necessário")]
         [MinLength(6, ErrorMessage = "Necessário um minimo de 6 dígitos")]
         public string login { get; set; }
 
+        [JsonProperty("password")]
         [Required(ErrorMessage = "Uma senha é necessária")]
         [DataType(DataType.Password)]
         public string password { get; set; }
