@@ -10,7 +10,7 @@ using WebApp.Security;
 using WebApp.ModelViews;
 using WebApp.Models;
 using Swashbuckle.AspNetCore.Annotations;
-using Newtonsoft.Json;
+using WebApp.DTO;
 
 namespace WebApp.Controllers
 {
@@ -28,43 +28,44 @@ namespace WebApp.Controllers
             _session = session;
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost("Login")]
         [AllowAnonymous]
-        [SwaggerResponse(200, "Login efetuado com sucesso", typeof(MVUser))]
-        [SwaggerResponse(500, "Error interno", typeof(GenericError))]
+        [SwaggerResponse(200, "Login efetuado com sucesso", typeof(PersonDTO))]
+        [SwaggerResponse(500, "Erro interno", typeof(GenericError))]
         public async Task<IActionResult> Login(MVUser model)
         {
             if (ModelState.IsValid)
             {
-                var encriptPassword = Security.SecuritySettings.Encript(model.password);
-                var user = await _repository.LoadAsyncCondition<User>(u => u.Passsword.Equals(encriptPassword) && u.Login.Equals(model.login));
+                var encriptPassword = SecuritySettings.Encript(model.password);
+                var user = await _repository.LoadAsyncCondition<User>(u => u.Password.Equals(encriptPassword) && u.Login.Equals(model.login));
+                var erros = new List<string>();
 
                 if (user == null)
-                    return BadRequest("Usuário não encontrado");
+                    erros.Add("Usuário não encontrado");
 
-                var token = Token.GenerateToken(user);
-                _session.Token = token;
-                _session.User = user;
-                _session.Browser = HttpContext.Request.Headers["User-Agent"];
-                _session.Data = DateTime.Now;
-                _session.Expires = DateTime.Now.AddSeconds(30);
-
-                var sessionUser = new SessionUser()
+                if (user != null)
                 {
-                    Token = token,
-                    User = user,
-                    Browser = _session.Browser,
-                    Data = _session.Data,
-                    Expires = _session.Expires
-                };
+                    var token = Token.GenerateToken(user);
+                    var sessionUser = new SessionUser()
+                    {
+                        Token = token,
+                        User = user,
+                        Browser = HttpContext.Request.Headers["User-Agent"],
+                        Data = DateTime.Now,
+                        Expires = DateTime.Now.AddMinutes(60)
+                    };
 
-                var x = await _repository.AddAsync<SessionUser>(sessionUser);
-                var obj = new { token = token };
+                    _session = sessionUser;
 
-                var result = JsonConvert.SerializeObject(obj);
+                    await _repository.AddAsync<SessionUser>(sessionUser);
 
-                return Ok(result);
+                    return Ok(new PersonDTO(user.Person.CompleteName, user.Person.Email, token, !erros.Any(), erros));
+                }
             }
             return BadRequest();
         }

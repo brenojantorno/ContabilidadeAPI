@@ -31,7 +31,7 @@ namespace WebApp.ModelViews
             obj = new User
             {
                 Login = model.login,
-                Passsword = model.password,
+                Password = model.password,
             };
 
             return obj;

@@ -11,7 +11,7 @@ namespace WebApp.Models
     {
         public int Id { get; set; }
         public string Login { get; set; }
-        public string Passsword { get; set; }
+        public string Password { get; set; }
         public int IdPerson { get; set; }
         public virtual Person Person { get; set; }
         public virtual ICollection<SessionUser> Sessions { get; set; }

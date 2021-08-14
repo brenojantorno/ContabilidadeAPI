@@ -58,7 +58,7 @@ namespace WebApp.Controllers
                             return BadRequest("Login existente");
 
                         var user = await MVUser.LoadObjectAsync(_repository, model.modelUser);
-                        user.Passsword = Security.SecuritySettings.Encript(user.Passsword);
+                        user.Password = Security.SecuritySettings.Encript(user.Password);
                         obj.Users.Add(user);
                     }
 

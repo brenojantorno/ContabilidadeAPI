@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -8,15 +7,13 @@ using Microsoft.Extensions.Hosting;
 using WebApp.Data;
 using WebApp.Security;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using WebApp.Models;
 using WebApp.Models.Interfaces;
-using Microsoft.AspNetCore.Localization;
-using Swashbuckle.AspNetCore;
 using Microsoft.OpenApi.Models;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace WebApp
 {
@@ -36,7 +33,34 @@ namespace WebApp
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ContabilidadeWebApi", Version = "v1" }); 
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ContabilidadeWebApi", Version = "v1" });
+                //c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                //{
+                //    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                //      Enter 'Bearer' [space] and then your token in the text input below.
+                //      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                //    Name = "Authorization",
+                //    In = ParameterLocation.Header,
+                //    Type = SecuritySchemeType.ApiKey,
+                //    Scheme = "Bearer"
+                //});
+                //c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                //   {
+                //     {
+                //       new OpenApiSecurityScheme
+                //        {
+                //            Reference = new OpenApiReference
+                //            {
+                //                Type = ReferenceType.SecurityScheme,
+                //                Id = "Bearer"
+                //            },
+                //            Scheme = "oauth2",
+                //            Name = "Bearer",
+                //            In = ParameterLocation.Header,
+                //        },
+                //       new List<string>()
+                //     }
+                //   });
             });
             services.AddDbContext<WebAppContext>(options =>
                 options.UseLazyLoadingProxies()
@@ -64,13 +88,6 @@ namespace WebApp
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseSwagger();
-            app.UseSwaggerUI(op =>
-            {
-                op.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApplication1 v1");
-                op.RoutePrefix = string.Empty;
-            });
-
             app.UseHttpsRedirection();
 
             app.UseRouting();
@@ -88,6 +105,13 @@ namespace WebApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(op =>
+            {
+                op.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApplication1 v1");
+                op.RoutePrefix = string.Empty;
             });
         }
     }

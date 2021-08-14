@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using WebApp.Models;
-using Microsoft.AspNetCore.Http;
 
 namespace WebApp.Security
 {
@@ -17,5 +12,15 @@ namespace WebApp.Security
         public int idUser { get; set; }
         public DateTime Data { get; set; }
         public virtual User User { get; set; }
+
+        //public SessionUser(string token, string browser, DateTime expires, int idUser, DateTime data, User user)
+        //{
+        //    Token = token;
+        //    Browser = browser;
+        //    Expires = expires;
+        //    this.idUser = idUser;
+        //    Data = data;
+        //    User = user;
+        //}
     }
 }
